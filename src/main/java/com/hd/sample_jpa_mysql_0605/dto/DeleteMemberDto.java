@@ -5,9 +5,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
-public class MemberReqDto {
+@Setter
+@NoArgsConstructor
+public class DeleteMemberDto {
     private String email;
     private String pwd;
-    private String name;
-    private String image;
 }
