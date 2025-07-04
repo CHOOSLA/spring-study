@@ -30,6 +30,12 @@ public class MemberController {
         return ResponseEntity.ok(memberService.findAll());
     }
 
+    // 회원 토큰으로 전체 조회
+    @GetMapping("/list")
+    public ResponseEntity<List<MemberResDto>> memberList() {
+        List<MemberResDto> list = memberService.getMemberList();
+        return ResponseEntity.ok(list);
+    }
 
     // 회원 상세 조회
     @GetMapping("/detail/{email}")
@@ -38,10 +44,10 @@ public class MemberController {
     }
 
     // 회원 정보 수정
-    @PostMapping("/modify")
-    public ResponseEntity<Boolean> modifyMember(@RequestBody MemberReqDto memberReqDto){
-        return ResponseEntity.ok(memberService.modifyMember(memberReqDto));
-    }
+//    @PostMapping("/modify")
+//    public ResponseEntity<Boolean> modifyMember(@RequestBody MemberReqDto memberReqDto){
+//        return ResponseEntity.ok(memberService.modifyMember(memberReqDto));
+//    }
 
     // 회원 삭제
     @PostMapping("/delete")

@@ -3,10 +3,14 @@ package com.hd.sample_jpa_mysql_0605.service;
 import com.hd.sample_jpa_mysql_0605.dto.DeleteMemberDto;
 import com.hd.sample_jpa_mysql_0605.dto.MemberReqDto;
 import com.hd.sample_jpa_mysql_0605.dto.MemberResDto;
+import com.hd.sample_jpa_mysql_0605.dto.PageResponseDto;
 import com.hd.sample_jpa_mysql_0605.entity.Member;
 import com.hd.sample_jpa_mysql_0605.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -31,6 +35,16 @@ public class MemberService {
         return memberResDtos;
     }
 
+    // 회원 전체 조회
+    public List<MemberResDto> getMemberList() {
+        List<Member> members = memberRepository.findAll();
+        List<MemberResDto> memberDtos = new ArrayList<>();
+        for(Member member : members) {
+            memberDtos.add(MemberResDto.of(member));
+        }
+        return memberDtos;
+    }
+
 
 
     // 회원 상세 조회
@@ -42,20 +56,20 @@ public class MemberService {
         return convertEntityToDto(member);
     }
 
-    // 회원 수정
-    public boolean modifyMember(MemberReqDto memberReqDto){
-        try{
-            Member member = memberRepository.findByEmail(memberReqDto.getEmail()).orElseThrow(
-                () -> new RuntimeException("해당 회원이 존재하지 않습니다") );// 500번 에러
-            member.setName(memberReqDto.getName());
-            member.setImage(memberReqDto.getPwd());
-            memberRepository.save(member);
-            return true;
-        }catch (Exception e){
-            log.error("회원 정보 수정 실패 : {}", e.getMessage());
-            return false;
-        }
-    }
+//    // 회원 수정
+//    public boolean modifyMember(MemberReqDto memberReqDto){
+//        try{
+//            Member member = memberRepository.findByEmail(memberReqDto.getEmail()).orElseThrow(
+//                () -> new RuntimeException("해당 회원이 존재하지 않습니다") );// 500번 에러
+//            member.setName(memberReqDto.getName());
+//            member.setImage(memberReqDto.getPwd());
+//            memberRepository.save(member);
+//            return true;
+//        }catch (Exception e){
+//            log.error("회원 정보 수정 실패 : {}", e.getMessage());
+//            return false;
+//        }
+//    }
 
     // 회원 삭제
     public boolean deleteMember(DeleteMemberDto deleteMemberDto){
@@ -74,11 +88,18 @@ public class MemberService {
         }
     }
 
+    public PageResponseDto<MemberResDto> getMemberPageList(int page, int size){
+        Pageable pageable = PageRequest.of(page,  size);
+        Page<Member> memberPage = memberRepository.findAll(pageable);
+        Page<MemberResDto> dtoPage = memberPage.map(this::convertEntityToDto);
+        return new PageResponseDto<>(dtoPage);
+    }
+
     // Entity -> DTO 매서드
     private MemberResDto convertEntityToDto ( Member member){
         MemberResDto memberResDto = new MemberResDto();
         memberResDto.setEmail(member.getEmail());
-        memberResDto.setPwd(member.getPwd());
+//        memberResDto.setPwd(member.getPwd());
         memberResDto.setName(member.getName());
         memberResDto.setImage(member.getImage());
         memberResDto.setRegDate(member.getRegDate());
